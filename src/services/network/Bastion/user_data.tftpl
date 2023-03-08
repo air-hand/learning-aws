@@ -1,0 +1,55 @@
+Content-Type: multipart/mixed; boundary="//"
+MIME-Version: 1.0
+
+--//
+Content-Type: text/cloud-config; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="cloud-config.txt"
+
+#cloud-config
+timezone: Asia/Tokyo
+locale: ja_JP.UTF8
+packages:
+  - bash-completion
+  - curl
+  - tree
+#power_state:
+#  delay: "+5"
+#  mode: reboot
+#  message: Reboot by cloud-init
+#  timeout: 30
+cloud_final_modules:
+- [scripts-user, always]
+
+--//
+Content-Type: text/x-shellscript; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="userdata.txt"
+
+#!/bin/bash
+
+yum update -y
+yum install -y bash-completion
+
+HOME=/home/ec2-user
+
+mkdir -p $HOME
+
+touch $HOME/.bashrc
+
+grep -qv "bash_completion" $HOME/.bashrc && echo ". /usr/share/bash-completion/bash_completion" >> $HOME/.bashrc
+
+mkdir -p $HOME/.ssh
+
+cat << 'EOF' > $HOME/.ssh/config
+Host *.${domain}
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+%{ for host in hosts ~}
+Host ${host}
+    Port 22
+    IdentitiesOnly yes
+%{ endfor ~}
+EOF
