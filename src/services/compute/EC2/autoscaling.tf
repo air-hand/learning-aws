@@ -1,7 +1,7 @@
 resource "aws_launch_template" "asg_tmpl" {
-  name_prefix            = "sample"
-  image_id               = data.aws_ami.amazonlinux2.id
-  instance_type          = "t2.micro"
+  name_prefix   = "sample"
+  image_id      = data.aws_ami.amazonlinux2.id
+  instance_type = "t2.micro"
   # TODO: applyの度にlatest_versionがインクリメントされるので仕込んだが効果なし https://github.com/hashicorp/terraform-provider-aws/issues/19411
   # https://github.com/hashicorp/terraform-provider-aws/issues/25909
   # metadata_optionsが反映されていない
