@@ -29,12 +29,9 @@ RUN \
     && /tmp/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli \
     ;
 
-COPY .terraform-version ./
-
 RUN \
     git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv \
     && ln -s ~/.tfenv/bin/* /usr/local/bin \
-    && tfenv install \
     ;
 
 ENV \
@@ -50,3 +47,7 @@ RUN \
 # https://code.visualstudio.com/remote/advancedcontainers/persist-bash-history
 ENV PROMPT_COMMAND='history -a' \
     HISTFILE=/commandhistory/.bash_history
+
+COPY .terraform-version ./
+
+RUN tfenv install
