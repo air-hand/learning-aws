@@ -69,38 +69,6 @@ resource "aws_s3_bucket_versioning" "tf_state" {
   }
 }
 
-#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-enable-bucket-logging
-resource "aws_s3_bucket" "tf_state_logging" {
-  bucket = var.logging_bucket
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "tf_state_logging_encrypt" {
-  bucket = aws_s3_bucket.tf_state_logging.bucket
-
-  rule {
-    apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.mykey.arn
-      sse_algorithm     = "aws:kms"
-    }
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "tf_state_logging" {
-  bucket = aws_s3_bucket.tf_state_logging.bucket
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_ownership_controls" "tf_state_logging" {
-  bucket = aws_s3_bucket.tf_state_logging.bucket
-  rule {
-    object_ownership = "BucketOwnerEnforced"
-  }
-}
-
 #
 #resource "aws_s3_bucket_acl" "tf_state" {
 #  bucket = aws_s3_bucket.tf_state.id
@@ -110,7 +78,7 @@ resource "aws_s3_bucket_ownership_controls" "tf_state_logging" {
 resource "aws_s3_bucket_logging" "tf_state" {
   bucket = aws_s3_bucket.tf_state.bucket
 
-  target_bucket = aws_s3_bucket.tf_state_logging.bucket
+  target_bucket = aws_s3_bucket.tf_state.bucket
   target_prefix = "log/"
 }
 
