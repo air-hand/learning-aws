@@ -69,6 +69,24 @@ resource "aws_s3_bucket_versioning" "tf_state" {
   }
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "tf_state_lc" {
+  bucket = aws_s3_bucket.tf_state.id
+
+  rule {
+    id = "rule-tf-state"
+
+    filter {
+      prefix = replace(var.key, "/\\/.+$/", "/")
+    }
+
+    noncurrent_version_expiration {
+      newer_noncurrent_versions = 5
+      noncurrent_days = 30
+    }
+    status = "Enabled"
+  }
+}
+
 #
 #resource "aws_s3_bucket_acl" "tf_state" {
 #  bucket = aws_s3_bucket.tf_state.id
