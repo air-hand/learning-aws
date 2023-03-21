@@ -5,7 +5,7 @@ repos:
         name: "Lint with makefile"
         language: system
         entry: make lint
-        files: '^src/.+$'
+        files: '^src/.+\.(tf.*|.hcl|y[a]?ml)$'
         pass_filenames: false
 
 #  - repo: https://github.com/antonbabenko/pre-commit-terraform
