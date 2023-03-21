@@ -1,8 +1,6 @@
 MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 IS_IN_CONTAINER := $(shell sh -c 'test -f /.dockerenv && echo 0 || echo 1')
 
-all: lint
-
 .SILENT: pre-command
 
 .PHONY: pre-command
@@ -18,8 +16,10 @@ watch: pre-command
 	inotifywait -m -e modify -e create -e delete -r $(MAKEFILE_DIR) --format '%T %w %f %e' --timefmt '%F %T' --include ".+?\.(tf|hcl|tfvars)$$" | \
 	while read EVENTS; do make fmt && make lint; done \
 
+# TODO: validate?
 .PHONY: lint
 lint: tf-validate tflint tfsec
+	@terraform fmt -check -recursive
 
 .PHONY: plan
 plan: lint

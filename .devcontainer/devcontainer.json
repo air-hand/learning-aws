@@ -16,6 +16,7 @@
         "type=volume,source=${localWorkspaceFolderBasename}-bashhistory,target=/commandhistory"
     ],
     "initializeCommand": "bash .devcontainer/initialize.sh",
+    "postStartCommand": "pre-commit install",
     "customizations": {
         "vscode": {
             "extensions": [

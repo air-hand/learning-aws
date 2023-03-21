@@ -5,15 +5,22 @@ ENV \
     LANG=en_US.UTF-8 \
     TZ=Asia/Tokyo
 
+RUN sed -ie 's!http://deb.debian.org/debian !http://ftp.jaist.ac.jp/debian !' /etc/apt/sources.list
+
 RUN apt update && apt install -y \
     apt-file \
-    make bash-completion tree jq vim git tig build-essential curl tar gzip unzip sudo tzdata \
+    make bash-completion tree jq vim git tig build-essential curl tar gzip unzip sudo tzdata man-db \
     automake autoconf libtool \
     locales-all \
     procps \
     graphviz \
+    docker.io \
+    python3-minimal \
+    python3-pip \
     && apt-file update \
     ;
+
+RUN python3 -m pip install -U pre-commit
 
 # https://github.com/inotify-tools/inotify-tools
 ENV INOTIFY_TOOLS_VER=3.22.6.0
