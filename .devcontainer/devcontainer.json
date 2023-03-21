@@ -15,10 +15,7 @@
         // https://code.visualstudio.com/remote/advancedcontainers/persist-bash-history
         "type=volume,source=${localWorkspaceFolderBasename}-bashhistory,target=/commandhistory"
     ],
-    "initializeCommand": [
-        "mkdir -p ${localEnv:HOME}/.aws",
-        "mkdir -p ${localEnv:HOME}/.config/gh",
-    ],
+    "initializeCommand": "bash .devcontainer/initialize.sh",
     "customizations": {
         "vscode": {
             "extensions": [

@@ -10,6 +10,7 @@ RUN apt update && apt install -y \
     make bash-completion tree jq vim git tig build-essential curl tar gzip unzip sudo tzdata \
     automake autoconf libtool \
     locales-all \
+    procps \
     && apt-file update \
     ;
 
