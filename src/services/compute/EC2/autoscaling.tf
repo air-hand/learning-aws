@@ -6,6 +6,12 @@ resource "aws_launch_template" "asg_tmpl" {
   # https://github.com/hashicorp/terraform-provider-aws/issues/25909
   # metadata_optionsが反映されていない
   update_default_version = false
+  lifecycle {
+    ignore_changes = [
+      # FIXME
+      metadata_options,
+    ]
+  }
 
   metadata_options {
     http_tokens            = "required"
@@ -26,6 +32,13 @@ resource "aws_launch_template" "asg_spot_tmpl" {
   metadata_options {
     http_tokens            = "required"
     instance_metadata_tags = "disabled"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      # FIXME
+      metadata_options,
+    ]
   }
 }
 
