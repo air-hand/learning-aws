@@ -69,4 +69,8 @@ login:
 
 .PHONY: dep_graph
 dep_graph:
-	terraform graph | dot -Tpng > graph.png
+	terraform graph | docker run --rm -i \
+		--name terraform-graph-beautifier \
+		ghcr.io/pcasteran/terraform-graph-beautifier:latest-linux \
+		--output-type=cyto-html \
+		> tmp/tf_dep.html
