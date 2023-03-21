@@ -81,7 +81,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "tf_state_lc" {
 
     noncurrent_version_expiration {
       newer_noncurrent_versions = 5
-      noncurrent_days = 30
+      noncurrent_days           = 30
     }
     status = "Enabled"
   }
