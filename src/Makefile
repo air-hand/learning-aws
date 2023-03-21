@@ -40,7 +40,7 @@ tflint: pre-command
 
 .PHONY: tfsec
 tfsec: pre-command
-	@tfsec . --tfvars-file terraform.tfvars && echo "tfsec succeeded."
+	@tfsec . && echo "tfsec succeeded."
 
 .PHONY: apply
 apply: pre-command lint
