@@ -66,3 +66,7 @@ migrate-state:
 .PHONY: login
 login:
 	ssh -F ssh_config bastion
+
+.PHONY: dep_graph
+dep_graph:
+	terraform graph | dot -Tpng > graph.png

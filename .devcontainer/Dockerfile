@@ -11,6 +11,7 @@ RUN apt update && apt install -y \
     automake autoconf libtool \
     locales-all \
     procps \
+    graphviz \
     && apt-file update \
     ;
 
