@@ -44,3 +44,7 @@ module "efs" {
   source  = "./services/storage/EFS"
   az_name = reverse(var.az_names)[0]
 }
+
+module "ecs" {
+  source = "./services/container/ECS"
+}
