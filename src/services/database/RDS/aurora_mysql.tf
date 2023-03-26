@@ -9,10 +9,7 @@ data "aws_subnet" "private" {
 
 #tfsec:ignore:aws-rds-encrypt-cluster-storage-data
 resource "aws_rds_cluster" "aurora-mysql" {
-  cluster_identifier = local.identifier
-  # allocated_storage  = 5
-  # db_cluster_instance_class = "db.t3.micro"
-  # storage_type              = "gp2"
+  cluster_identifier     = local.identifier
   engine                 = "aurora-mysql"
   engine_mode            = "provisioned"
   engine_version         = "8.0.mysql_aurora.3.03.0"
@@ -30,4 +27,13 @@ resource "aws_rds_cluster" "aurora-mysql" {
       availability_zones,
     ]
   }
+}
+
+resource "aws_rds_cluster_instance" "instances" {
+  count              = 2
+  identifier         = "${local.identifier}-${count.index}"
+  cluster_identifier = aws_rds_cluster.aurora-mysql.id
+  instance_class     = "db.t3.medium"
+  engine             = aws_rds_cluster.aurora-mysql.engine
+  apply_immediately  = true
 }
