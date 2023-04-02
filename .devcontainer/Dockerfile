@@ -5,6 +5,11 @@ ENV \
     LANG=en_US.UTF-8 \
     TZ=Asia/Tokyo
 
+ARG USERNAME
+ARG UID
+ARG GID
+ARG HOMEDIR
+
 RUN sed -ie 's!http://deb.debian.org/debian !http://ftp.jaist.ac.jp/debian !' /etc/apt/sources.list
 
 RUN apt update && apt install -y \
@@ -18,6 +23,13 @@ RUN apt update && apt install -y \
     python3-minimal \
     python3-pip \
     && apt-file update \
+    ;
+
+RUN groupadd --gid $GID $USERNAME \
+    && useradd --uid $UID -d ${HOMEDIR} -m --gid $GID $USERNAME \
+    && echo "${USERNAME} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/${USERNAME} \
+    && chmod 0440 /etc/sudoers.d/$USERNAME \
+    && chown $USERNAME:$USERNAME ${HOMEDIR} \
     ;
 
 RUN python3 -m pip install -U pre-commit
@@ -56,7 +68,10 @@ RUN \
 # https://code.visualstudio.com/remote/advancedcontainers/persist-bash-history
 ENV PROMPT_COMMAND='history -a' \
     HISTFILE=/commandhistory/.bash_history
+RUN mkdir -p /commandhistory && chown -R $USERNAME:$USERNAME /commandhistory
 
 COPY .terraform-version ./
 
 RUN tfenv install
+
+USER $USERNAME
