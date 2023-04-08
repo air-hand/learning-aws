@@ -20,11 +20,8 @@ services:
         source: ~/.aws/
         target: ${HOMEDIR}/.aws/
       - type: bind
-        source: ~/.config
-        target: ${HOMEDIR}/.config
-      - type: bind
-        source: ~/.config/.gh
-        target: ${HOMEDIR}/.config/.gh
+        source: ~/.config/gh
+        target: ${HOMEDIR}/.config/gh
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock

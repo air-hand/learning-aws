@@ -29,7 +29,8 @@ RUN groupadd --gid $GID $USERNAME \
     && useradd --uid $UID -d ${HOMEDIR} -m --gid $GID $USERNAME \
     && echo "${USERNAME} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/${USERNAME} \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
-    && chown $USERNAME:$USERNAME ${HOMEDIR} \
+    && mkdir -p ${HOMEDIR}/.config \
+    && chown -R $USERNAME:$USERNAME ${HOMEDIR} \
     ;
 
 RUN python3 -m pip install -U pre-commit
