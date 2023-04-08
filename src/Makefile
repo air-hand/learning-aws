@@ -50,10 +50,6 @@ apply: pre-command lint
 destroy: pre-command lint
 	@terraform destroy
 
-.PHONY: random-string-lower
-random-string-lower:
-	@cat /dev/urandom | tr -dc '[:alnum:]' | head -c 40 | tr '[:upper:]' '[:lower:]';
-
 .PHONY: init
 init:
 	@BC_PATH=remote-state/backend-config.auto.tfvars; \
@@ -72,10 +68,6 @@ migrate-state:
 	fi; \
 	terraform init -backend-config=$${BC_PATH} -migrate-state
 
-.PHONY: login
-login:
-	ssh -F ssh_config bastion
-
 .PHONY: dep_graph
 dep_graph:
 	terraform graph | docker run --rm -i \
@@ -83,3 +75,11 @@ dep_graph:
 		ghcr.io/pcasteran/terraform-graph-beautifier:latest-linux \
 		--output-type=cyto-html \
 		> tmp/tf_dep.html
+
+.PHONY: login
+login:
+	ssh -F ssh_config bastion
+
+.PHONY: random-string-lower
+random-string-lower:
+	@cat /dev/urandom | tr -dc '[:alnum:]' | head -c 40 | tr '[:upper:]' '[:lower:]';
