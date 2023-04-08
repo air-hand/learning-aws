@@ -52,8 +52,8 @@ RUN \
     ;
 
 RUN \
-    git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv \
-    && ln -s ~/.tfenv/bin/* /usr/local/bin \
+    git clone --depth=1 https://github.com/tfutils/tfenv.git /usr/local/tfenv \
+    && ln -s /usr/local/tfenv/bin/* /usr/local/bin \
     ;
 
 ENV \
