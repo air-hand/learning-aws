@@ -1,8 +1,25 @@
-resource "aws_cloudwatch_event_rule" "task_scheduler" {
-  name                = "every_day_task"
-  description         = "Schedule task to run daily"
-  schedule_expression = "cron(0 3 * * ? *)"
+data "aws_iam_policy_document" "task_policy" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
+  }
 }
+
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name               = "ecs-task-execution-role"
+  assume_role_policy = data.aws_iam_policy_document.task_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
+  role       = aws_iam_role.ecs_task_execution_role.id
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+data "aws_region" "current" {}
 
 resource "aws_ecs_cluster" "tasks" {
   name = "tasks"
@@ -17,65 +34,25 @@ resource "aws_ecs_task_definition" "daily_task" {
 
   network_mode = "awsvpc"
 
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+
   container_definitions = jsonencode([
     {
       name  = "daily_task",
       image = "python:3.11"
       command : [
-        "python -V"
+        "python -c 'import sys; import datetime; print(sys.version); print(datetime.datetime.now())'"
       ],
       cpu : 512,
       memory : 1024,
+      logConfiguration : {
+        logDriver : "awslogs",
+        options : {
+          awslogs-group : aws_cloudwatch_log_group.ecs_scheduled_task.name,
+          awslogs-region : data.aws_region.current.name,
+          awslogs-stream-prefix : "ecs",
+        }
+      }
     }
   ])
-}
-
-data "aws_iam_policy_document" "task_policy" {
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["events.amazonaws.com"]
-    }
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-resource "aws_iam_role" "ecs_events" {
-  name               = "ecs_events"
-  assume_role_policy = data.aws_iam_policy_document.task_policy.json
-}
-
-#tfsec:ignore:aws-iam-no-policy-wildcards
-data "aws_iam_policy_document" "ecs_events_run_task_with_any_role" {
-  statement {
-    effect    = "Allow"
-    actions   = ["iam:PassRole"]
-    resources = ["*"]
-  }
-
-  statement {
-    effect    = "Allow"
-    actions   = ["ecs:RunTask"]
-    resources = [replace(aws_ecs_task_definition.daily_task.arn, "/:\\d+$/", ":*")]
-  }
-}
-
-resource "aws_iam_role_policy" "ecs_events_run_task_with_any_role" {
-  name   = "ecs_events_run_task_with_any_role"
-  role   = aws_iam_role.ecs_events.id
-  policy = data.aws_iam_policy_document.ecs_events_run_task_with_any_role.json
-}
-
-resource "aws_cloudwatch_event_target" "task_target" {
-  target_id = "daily_ecs_task_schedule_target"
-  rule      = aws_cloudwatch_event_rule.task_scheduler.name
-  arn       = aws_ecs_cluster.tasks.arn
-  role_arn  = aws_iam_role.ecs_events.arn
-  #input =
-
-  ecs_target {
-    task_count          = 1
-    task_definition_arn = aws_ecs_task_definition.daily_task.arn
-  }
 }
