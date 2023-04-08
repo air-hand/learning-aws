@@ -54,6 +54,15 @@ destroy: pre-command lint
 random-string-lower:
 	@cat /dev/urandom | tr -dc '[:alnum:]' | head -c 40 | tr '[:upper:]' '[:lower:]';
 
+.PHONY: init
+init:
+	@BC_PATH=remote-state/backend-config.auto.tfvars; \
+	if [ ! -e $${BC_PATH} ]; then \
+		echo "create $${BC_PATH} first."; >&2 \
+		exit 1; \
+	fi; \
+	terraform init -backend-config=$${BC_PATH}
+
 .PHONY: migrate-state
 migrate-state:
 	@BC_PATH=remote-state/backend-config.auto.tfvars; \
