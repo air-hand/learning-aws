@@ -10,11 +10,14 @@ ARG UID
 ARG GID
 ARG HOMEDIR
 
+SHELL ["/bin/bash", "-c"]
+
 RUN sed -ie 's!http://deb.debian.org/debian !http://ftp.jaist.ac.jp/debian !' /etc/apt/sources.list
 
-RUN apt update && apt install -y \
+RUN apt update && apt install -y --no-install-recommends \
     apt-file \
     make bash-completion tree jq vim git tig build-essential curl tar gzip unzip sudo tzdata man-db \
+    openssh-client \
     automake autoconf libtool \
     locales-all \
     procps \
@@ -25,12 +28,13 @@ RUN apt update && apt install -y \
     && apt-file update \
     ;
 
-RUN groupadd --gid $GID $USERNAME \
+RUN ! id $USERNAME &>/dev/null && groupadd --gid $GID $USERNAME \
     && useradd --uid $UID -d ${HOMEDIR} -m --gid $GID $USERNAME \
     && echo "${USERNAME} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/${USERNAME} \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
     && mkdir -p ${HOMEDIR}/.config \
     && chown -R $USERNAME:$USERNAME ${HOMEDIR} \
+    || true \
     ;
 
 RUN python3 -m pip install -U pre-commit
