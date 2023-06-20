@@ -20,6 +20,7 @@
                 "editorconfig.editorconfig",
                 "eamodio.gitlens",
                 "bierner.markdown-mermaid",
+                "github.copilot",
             ],
             "settings": {
                 "editor.suggest.preview": true,
