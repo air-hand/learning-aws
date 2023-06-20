@@ -37,3 +37,11 @@ resource "aws_security_group" "mysql_security_group" {
     cidr_blocks = [data.aws_vpc.tf.cidr_block]
   }
 }
+
+# route53 private host zone
+resource "aws_route53_zone" "private_rds" {
+  name = "rds.prv"
+  vpc {
+    vpc_id = data.aws_vpc.tf.id
+  }
+}
