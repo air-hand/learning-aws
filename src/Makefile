@@ -46,6 +46,10 @@ tfsec: pre-command
 apply: pre-command lint
 	@terraform apply
 
+.PHONY: refresh
+refresh: pre-command lint
+	@terraform apply -refresh-only
+
 .PHONY: destroy
 destroy: pre-command lint
 	@terraform destroy
