@@ -1,25 +1,21 @@
 # ex) aws ec2 describe-images --owners amazon --filters "Name=name,Values=amzn2-ami-*" "Name=architecture,Values=x86_64" "Name=virtualization-type,Values=hvm"
 # filters -> aws ec2 describe-images help
-data "aws_ami" "amazonlinux2" {
-  filter {
-    name   = "image-id"
-    values = ["ami-06ee4e2261a4dc5c3"]
-  }
-
-  owners = ["amazon"]
-}
-
-data "aws_ami" "amzn2_latest" {
+data "aws_ami" "amazonlinux" {
   most_recent = true
 
   filter {
+    name   = "creation-date"
+    values = ["2023-06-*"]
+  }
+
+  filter {
     name   = "name"
-    values = ["amzn2-ami-kernel-*"]
+    values = ["al2023-ami-minimal-*-kernel*"]
   }
 
   filter {
     name   = "architecture"
-    values = ["x86_64"]
+    values = ["arm64"]
   }
 
   filter {

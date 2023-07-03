@@ -1,21 +1,21 @@
 # ex) aws ec2 describe-images --owners amazon --filters "Name=name,Values=amzn2-ami-kernel-*" "Name=architecture,Values=x86_64" "Name=virtualization-type,Values=hvm" --query 'Images[] | reverse(sort_by(@, &CreationDate))[].Name'
 # filters -> aws ec2 describe-images help
-data "aws_ami" "amazonlinux2" {
+data "aws_ami" "amazonlinux" {
   most_recent = true
 
   filter {
     name   = "creation-date"
-    values = ["2023-01-*"]
+    values = ["2023-06-*"]
   }
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-kernel-*"]
+    values = ["al2023-ami-minimal-*-kernel*"]
   }
 
   filter {
     name   = "architecture"
-    values = ["x86_64"]
+    values = ["arm64"]
   }
 
   filter {
@@ -60,8 +60,8 @@ data "aws_subnets" "public" {
 }
 
 resource "aws_instance" "bastions" {
-  ami                    = data.aws_ami.amazonlinux2.id
-  instance_type          = "t2.micro"
+  ami                    = data.aws_ami.amazonlinux.id
+  instance_type          = "t4g.nano"
   key_name               = aws_key_pair.ec2_keypair.key_name
   vpc_security_group_ids = [module.public_ssh_security_group.security_group_id]
 
