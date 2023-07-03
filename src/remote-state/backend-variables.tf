@@ -17,7 +17,3 @@ variable "encrypt" {
 variable "dynamodb_table" {
   type = string
 }
-
-variable "logging_bucket" {
-  type = string
-}

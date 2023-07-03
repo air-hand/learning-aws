@@ -22,7 +22,6 @@ module "vpc" {
   default_security_group_ingress = []
   default_security_group_egress  = []
 
-  # FIXME: NATGateway 高い...
   #enable_nat_gateway = true
 
   # private dns host zoneに必要

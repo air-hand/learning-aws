@@ -1,2 +1,0 @@
-# backend-configに入れると面倒なものをこちらに入れる
-logging_bucket = "s3_logging_bucket_name"

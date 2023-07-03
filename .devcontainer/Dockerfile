@@ -5,13 +5,39 @@ ENV \
     LANG=en_US.UTF-8 \
     TZ=Asia/Tokyo
 
-RUN apt update && apt install -y \
+ARG USERNAME
+ARG UID
+ARG GID
+ARG HOMEDIR
+
+SHELL ["/bin/bash", "-c"]
+
+RUN sed -ie 's!http://deb.debian.org/debian !http://ftp.jaist.ac.jp/debian !' /etc/apt/sources.list
+
+RUN apt update && apt install -y --no-install-recommends \
     apt-file \
-    make bash-completion tree jq vim git tig build-essential curl tar gzip unzip sudo tzdata \
+    make bash-completion tree jq vim git tig build-essential curl tar gzip unzip sudo tzdata man-db \
+    openssh-client \
     automake autoconf libtool \
     locales-all \
+    procps \
+    graphviz \
+    docker.io \
+    python3-minimal \
+    python3-pip \
     && apt-file update \
     ;
+
+RUN ! id $USERNAME &>/dev/null && groupadd --gid $GID $USERNAME \
+    && useradd --uid $UID -d ${HOMEDIR} -m --gid $GID $USERNAME \
+    && echo "${USERNAME} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/${USERNAME} \
+    && chmod 0440 /etc/sudoers.d/$USERNAME \
+    && mkdir -p ${HOMEDIR}/.config \
+    && chown -R $USERNAME:$USERNAME ${HOMEDIR} \
+    || true \
+    ;
+
+RUN python3 -m pip install -U pre-commit
 
 # https://github.com/inotify-tools/inotify-tools
 ENV INOTIFY_TOOLS_VER=3.22.6.0
@@ -29,12 +55,9 @@ RUN \
     && /tmp/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli \
     ;
 
-COPY .terraform-version ./
-
 RUN \
-    git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv \
-    && ln -s ~/.tfenv/bin/* /usr/local/bin \
-    && tfenv install \
+    git clone --depth=1 https://github.com/tfutils/tfenv.git /usr/local/tfenv \
+    && ln -s /usr/local/tfenv/bin/* /usr/local/bin \
     ;
 
 ENV \
@@ -50,3 +73,10 @@ RUN \
 # https://code.visualstudio.com/remote/advancedcontainers/persist-bash-history
 ENV PROMPT_COMMAND='history -a' \
     HISTFILE=/commandhistory/.bash_history
+RUN mkdir -p /commandhistory && chown -R $USERNAME:$USERNAME /commandhistory
+
+COPY .terraform-version ./
+
+RUN tfenv install
+
+USER $USERNAME
